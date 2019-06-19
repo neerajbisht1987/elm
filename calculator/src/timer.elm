@@ -3,33 +3,35 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Browser exposing (sandbox)
-import Time exposing (..)
+import Time 
+import Time exposing (Month(..), utc)
+import Time.Extra as Time
 
 type Status = Running | Expired
 
 type alias Model =
     {
-        expirationTime:Time
-        ,remainingTime:Time
+        expirationTime:Time.Posix
+        ,remainingTime:Time.Posix
         ,status:Status
     }
-
-parseTime : String -> Time
-parseTime string = 
-    Date.fromString string
-    |> Result.Default (Date.fromTime  0)
-    |> Date.toTime
+--parseTime : String -> Time.Posix
+--parseTime string = 
+--    Time.Parts string |> Time.partsToPosix utc
+--   Date.fromString string
+--    |> Result.Default (Date.fromTime  0)
+--    |> Date.toTime
 
 
 initModel : Model
 initModel = {
-    expirationTime=(parseTime "Mar 14 2017 13:05:00"),
+    expirationTime=(Time.Parts 2017 Mar 14 13 5 0 |> Time.partsToPosix utc),
     remainingTime=0,
     status=Running}
 
 
 
-type Msg = CurrentTime Time
+type Msg = CurrentTime Time.Posix
 
 update : Msg -> Model  ->( Model ,Cmd Msg)
 
@@ -41,7 +43,7 @@ update msg model =
                     model.expirationTime - now
                 status =
                     if remainingTime < 0 
-                    then status Expired
+                    then Expired
                     else Running
             in 
                 ( {
@@ -57,9 +59,9 @@ view model =
         Expired ->
             h3 [][text "Expired"]
 
-viewRemainingTime :Time -> List (Html Msg)
+viewRemainingTime :Time.Posix -> List (Html Msg)
 viewRemainingTime time = 
-    List.map viewTimePeriod (timePeriods t)
+    List.map viewTimePeriod (timePeriods time)
 
 viewTimePeriod :(String, String) -> Html Msg
 viewTimePeriod (period ,amount) = 
@@ -70,16 +72,14 @@ viewTimePeriod (period ,amount) =
     ]
 
 
-timePeriods :Time ->List(String,String)
+timePeriods :Time.Posix ->List(String,String)
 timePeriods time =
-    let seconds = 
-            floor (t/1000) % 60
-        minutes = 
-            floor (t/1000 / 60) % 60
-        hour =
-            floor(t/1000/ 60 * 60)% 24 
+    let seconds = Time.toSecond utc time            
+        minutes = Time.toMinute utc time
+        hours = Time.toHour utc time
+        days = Time.toDay utc time
         addLeadingZeros n = 
-            String.padLeft 2 '0' (toString n)
+            String.padLeft 2 '0' (Debug.toString n)
     in 
         [days,hours,minutes,seconds]
         |> List.map addLeadingZeros
@@ -87,7 +87,7 @@ timePeriods time =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-        Time.every second CurrentTime
+        Time.every Time.second CurrentTime
 
 
 main : Program () Model Msg
