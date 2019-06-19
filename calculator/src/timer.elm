@@ -3,7 +3,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Browser exposing (sandbox)
-import Time exposing (Time,second)
+import Time exposing (..)
 
 type Status = Running | Expired
 
@@ -14,20 +14,20 @@ type alias Model =
         ,status:Status
     }
 
-    
-
-initModel : Model
-initModel = {
-    expirationTime = parseTime "Mar 14 2017 13:05:00"
-    , remainingTime = 0
-    , status = Running
-}
-
 parseTime : String -> Time
 parseTime string = 
     Date.fromString string
     |> Result.Default (Date.fromTime  0)
     |> Date.toTime
+
+
+initModel : Model
+initModel = {
+    expirationTime=(parseTime "Mar 14 2017 13:05:00"),
+    remainingTime=0,
+    status=Running}
+
+
 
 type Msg = CurrentTime Time
 
@@ -62,7 +62,7 @@ viewRemainingTime time =
     List.map viewTimePeriod (timePeriods t)
 
 viewTimePeriod :(String, String) -> Html Msg
-viewTimePeriod (period amount) = 
+viewTimePeriod (period ,amount) = 
     div [class "time-period"]
     [
         span [class "amount"][text amount]
@@ -83,7 +83,7 @@ timePeriods time =
     in 
         [days,hours,minutes,seconds]
         |> List.map addLeadingZeros
-        |> List.map2 (,) ["days","hours","minutes","seconds "]
+        |> List.map2 ("," ) ["days","hours","minutes","seconds "]
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -92,7 +92,7 @@ subscriptions model =
 
 main : Program () Model Msg
 main =  Browser.sandbox
-        { init = initProperty
+        { init = initModel
         , view = view
         , update = update
         ,subscriptions = subscriptions
