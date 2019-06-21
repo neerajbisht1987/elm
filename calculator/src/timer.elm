@@ -22,12 +22,12 @@ type alias Model =
 --    |> Date.toTime
 
 
-initModel : Model
-initModel = {
+initModel : (Model, Cmd Msg)
+initModel = ({
     expirationTime=
-        Time.Parts 2017 Time.Mar 14 13 5 0 0 |> Time.partsToPosix utc |> Time.toMillis utc,
+        Time.Parts 2019 Time.Jul 14 13 5 0 0 |> Time.partsToPosix utc |> Time.toMillis utc,
     remainingTime=0,
-    status=Running}
+    status=Running}, Cmd.none)
 
 
 
@@ -51,7 +51,7 @@ update msg model =
                     status = status},
                     Cmd.none)
 
-view : Model ->Html Msg
+view : Model -> Html Msg
 view model = 
     case model.status of 
         Running ->
@@ -91,9 +91,9 @@ subscriptions model =
 
 
 main : Program () Model Msg
-main =  Browser.sandbox
-        {init=initModel
-        ,subscriptions=subscriptions
-        ,update=update
+main=Browser.element
+        {init=\()->initModel
         ,view=view
+        ,update=update
+        ,subscriptions=subscriptions        
         }
