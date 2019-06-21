@@ -3,16 +3,15 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Browser exposing (sandbox)
-import Time 
-import Time exposing (Month(..), utc)
+import Time exposing (Month, utc)
 import Time.Extra as Time
 
 type Status = Running | Expired
 
 type alias Model =
     {
-        expirationTime:Time.Posix
-        ,remainingTime:Time.Posix
+        expirationTime:Int
+        ,remainingTime:Int
         ,status:Status
     }
 --parseTime : String -> Time.Posix
@@ -25,7 +24,8 @@ type alias Model =
 
 initModel : Model
 initModel = {
-    expirationTime=(Time.Parts 2017 Mar 14 13 5 0 |> Time.partsToPosix utc),
+    expirationTime=
+        Time.Parts 2017 Time.Mar 14 13 5 0 0 |> Time.partsToPosix utc |> Time.toMillis utc,
     remainingTime=0,
     status=Running}
 
@@ -40,7 +40,7 @@ update msg model =
         CurrentTime now ->
             let 
                 remainingTime =
-                    model.expirationTime - now
+                    model.expirationTime - Time.toMillis utc now
                 status =
                     if remainingTime < 0 
                     then Expired
@@ -59,7 +59,7 @@ view model =
         Expired ->
             h3 [][text "Expired"]
 
-viewRemainingTime :Time.Posix -> List (Html Msg)
+viewRemainingTime :Int -> List (Html Msg)
 viewRemainingTime time = 
     List.map viewTimePeriod (timePeriods time)
 
@@ -72,28 +72,28 @@ viewTimePeriod (period ,amount) =
     ]
 
 
-timePeriods :Time.Posix ->List(String,String)
+timePeriods :Int ->List(String,String)
 timePeriods time =
-    let seconds = Time.toSecond utc time            
-        minutes = Time.toMinute utc time
-        hours = Time.toHour utc time
-        days = Time.toDay utc time
+    let seconds = Time.toSecond utc (Time.millisToPosix time)            
+        minutes = Time.toMinute utc (Time.millisToPosix time)
+        hours = Time.toHour utc (Time.millisToPosix time)
+        days = Time.toDay utc (Time.millisToPosix time)
         addLeadingZeros n = 
             String.padLeft 2 '0' (Debug.toString n)
     in 
         [days,hours,minutes,seconds]
         |> List.map addLeadingZeros
-        |> List.map2 ("," ) ["days","hours","minutes","seconds "]
+        |> List.map2 (\a b ->(a,b)) ["days","hours","minutes","seconds "]
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-        Time.every Time.second CurrentTime
+        Time.every 1000 CurrentTime
 
 
 main : Program () Model Msg
 main =  Browser.sandbox
-        { init = initModel
-        , view = view
-        , update = update
-        ,subscriptions = subscriptions
+        {init=initModel
+        ,subscriptions=subscriptions
+        ,update=update
+        ,view=view
         }
