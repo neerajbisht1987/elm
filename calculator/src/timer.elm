@@ -10,8 +10,8 @@ type Status = Running | Expired
 
 type alias Model =
     {
-        expirationTime:Int
-        ,remainingTime:Int
+        expirationTime:Time.Posix
+        ,remainingTime:Time.Posix
         ,status:Status
     }
 --parseTime : String -> Time.Posix
@@ -25,13 +25,51 @@ type alias Model =
 initModel : (Model, Cmd Msg)
 initModel = ({
     expirationTime=
-        Time.Parts 2019 Time.Jul 14 13 5 0 0 |> Time.partsToPosix utc |> Time.toMillis utc,
-    remainingTime=0,
+        Time.Parts 2019 Time.Jul 14 13 5 0 0 |> Time.partsToPosix utc,
+    remainingTime=Time.millisToPosix 0,
     status=Running}, Cmd.none)
 
 
 
 type Msg = CurrentTime Time.Posix
+
+
+remainingTimefn : Time.Posix -> Time.Posix -> Time.Posix
+remainingTimefn exprTime now =
+    let 
+        days =
+            if Time.toYear utc exprTime >=  Time.toYear utc now &&
+               --Time.toMonth utc exprTime >= Time.toMonth utc now &&
+               Time.toDay utc exprTime >= Time.toDay utc now
+            then
+                Time.toDay utc exprTime - Time.toDay utc now
+            else
+                0
+        hours = if Time.toYear utc exprTime >=  Time.toYear utc now &&
+                   --Time.toMonth utc exprTime >= Time.toMonth utc now &&
+                   Time.toDay utc exprTime >= Time.toDay utc now 
+                then
+                     24 - Time.toHour utc now
+                else
+                    0
+        mins =if Time.toYear utc exprTime >=  Time.toYear utc now &&
+                 --Time.toMonth utc exprTime >= Time.toMonth utc now &&
+                 Time.toDay utc exprTime >= Time.toDay utc now &&
+                  Time.toHour utc exprTime >= Time.toHour utc now 
+                then
+                    60 - Time.toMinute utc now
+              else 0      
+        secs= if Time.toYear utc exprTime >=  Time.toYear utc now &&
+                 --Time.toMonth utc exprTime >= Time.toMonth utc now &&
+                 Time.toDay utc exprTime >= Time.toDay utc now &&
+                 Time.toHour utc exprTime >= Time.toHour utc now &&
+                 Time.toMinute utc exprTime >= Time.toMinute utc now 
+                then
+                    60 - Time.toSecond utc now
+                else
+                    0
+        in 
+        Time.Parts (Time.toYear utc now) (Time.toMonth utc now) days hours mins secs 0 |> Time.partsToPosix utc
 
 update : Msg -> Model  ->( Model ,Cmd Msg)
 
@@ -40,9 +78,9 @@ update msg model =
         CurrentTime now ->
             let 
                 remainingTime =
-                    model.expirationTime - Time.toMillis utc now
+                    remainingTimefn model.expirationTime now
                 status =
-                    if remainingTime < 0 
+                    if  Time.toMillis utc remainingTime < 0 
                     then Expired
                     else Running
             in 
@@ -59,7 +97,7 @@ view model =
         Expired ->
             h3 [][text "Expired"]
 
-viewRemainingTime :Int -> List (Html Msg)
+viewRemainingTime :Time.Posix -> List (Html Msg)
 viewRemainingTime time = 
     List.map viewTimePeriod (timePeriods time)
 
@@ -72,12 +110,12 @@ viewTimePeriod (period ,amount) =
     ]
 
 
-timePeriods :Int ->List(String,String)
+timePeriods :Time.Posix ->List(String,String)
 timePeriods time =
-    let seconds = Time.toSecond utc (Time.millisToPosix time)            
-        minutes = Time.toMinute utc (Time.millisToPosix time)
-        hours = Time.toHour utc (Time.millisToPosix time)
-        days = Time.toDay utc (Time.millisToPosix time)
+    let seconds = Time.toSecond utc time            
+        minutes = Time.toMinute utc time
+        hours = Time.toHour utc  time
+        days = Time.toDay utc time
         addLeadingZeros n = 
             String.padLeft 2 '0' (Debug.toString n)
     in 

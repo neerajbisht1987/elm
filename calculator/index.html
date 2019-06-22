@@ -4882,18 +4882,13 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var elm$time$Time$Jul = {$: 'Jul'};
-var elm$core$Basics$modBy = _Basics_modBy;
-var elm$time$Time$posixToMillis = function (_n0) {
-	var millis = _n0.a;
-	return millis;
+var elm$core$Basics$identity = function (x) {
+	return x;
 };
-var elm$time$Time$toMillis = F2(
-	function (_n0, time) {
-		return A2(
-			elm$core$Basics$modBy,
-			1000,
-			elm$time$Time$posixToMillis(time));
-	});
+var elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var elm$time$Time$millisToPosix = elm$time$Time$Posix;
 var elm$time$Time$Zone = F2(
 	function (a, b) {
 		return {$: 'Zone', a: a, b: b};
@@ -4907,12 +4902,10 @@ var elm$core$Basics$clamp = F3(
 	function (low, high, number) {
 		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
 	});
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
 var justinmimbs$date$Date$RD = function (a) {
 	return {$: 'RD', a: a};
 };
+var elm$core$Basics$modBy = _Basics_modBy;
 var elm$core$Basics$neq = _Utils_notEqual;
 var justinmimbs$date$Date$isLeapYear = function (y) {
 	return ((!A2(elm$core$Basics$modBy, 4, y)) && A2(elm$core$Basics$modBy, 100, y)) || (!A2(elm$core$Basics$modBy, 400, y));
@@ -4994,10 +4987,6 @@ var justinmimbs$date$Date$fromCalendarDate = F3(
 				A2(justinmimbs$date$Date$daysInMonth, y, m),
 				d));
 	});
-var elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var elm$time$Time$millisToPosix = elm$time$Time$Posix;
 var justinmimbs$date$Date$toRataDie = function (_n0) {
 	var rd = _n0.a;
 	return rd;
@@ -5005,6 +4994,10 @@ var justinmimbs$date$Date$toRataDie = function (_n0) {
 var justinmimbs$time_extra$Time$Extra$dateToMillis = function (date) {
 	var daysSinceEpoch = justinmimbs$date$Date$toRataDie(date) - 719163;
 	return daysSinceEpoch * 86400000;
+};
+var elm$time$Time$posixToMillis = function (_n0) {
+	var millis = _n0.a;
+	return millis;
 };
 var elm$time$Time$flooredDiv = F2(
 	function (numerator, denominator) {
@@ -5135,6 +5128,13 @@ var elm$time$Time$toHour = F2(
 				A2(elm$time$Time$toAdjustedMinutes, zone, time),
 				60));
 	});
+var elm$time$Time$toMillis = F2(
+	function (_n0, time) {
+		return A2(
+			elm$core$Basics$modBy,
+			1000,
+			elm$time$Time$posixToMillis(time));
+	});
 var elm$time$Time$toMinute = F2(
 	function (zone, time) {
 		return A2(
@@ -5212,13 +5212,10 @@ var justinmimbs$time_extra$Time$Extra$partsToPosix = F2(
 var author$project$Main$initModel = _Utils_Tuple2(
 	{
 		expirationTime: A2(
-			elm$time$Time$toMillis,
+			justinmimbs$time_extra$Time$Extra$partsToPosix,
 			elm$time$Time$utc,
-			A2(
-				justinmimbs$time_extra$Time$Extra$partsToPosix,
-				elm$time$Time$utc,
-				A7(justinmimbs$time_extra$Time$Extra$Parts, 2019, elm$time$Time$Jul, 14, 13, 5, 0, 0))),
-		remainingTime: 0,
+			A7(justinmimbs$time_extra$Time$Extra$Parts, 2019, elm$time$Time$Jul, 14, 13, 5, 0, 0)),
+		remainingTime: elm$time$Time$millisToPosix(0),
 		status: author$project$Main$Running
 	},
 	elm$core$Platform$Cmd$none);
@@ -5730,11 +5727,52 @@ var author$project$Main$subscriptions = function (model) {
 	return A2(elm$time$Time$every, 1000, author$project$Main$CurrentTime);
 };
 var author$project$Main$Expired = {$: 'Expired'};
+var author$project$Main$remainingTimefn = F2(
+	function (exprTime, now) {
+		var secs = ((_Utils_cmp(
+			A2(elm$time$Time$toYear, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toYear, elm$time$Time$utc, now)) > -1) && ((_Utils_cmp(
+			A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toDay, elm$time$Time$utc, now)) > -1) && ((_Utils_cmp(
+			A2(elm$time$Time$toHour, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toHour, elm$time$Time$utc, now)) > -1) && (_Utils_cmp(
+			A2(elm$time$Time$toMinute, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toMinute, elm$time$Time$utc, now)) > -1)))) ? (60 - A2(elm$time$Time$toSecond, elm$time$Time$utc, now)) : 0;
+		var mins = ((_Utils_cmp(
+			A2(elm$time$Time$toYear, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toYear, elm$time$Time$utc, now)) > -1) && ((_Utils_cmp(
+			A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toDay, elm$time$Time$utc, now)) > -1) && (_Utils_cmp(
+			A2(elm$time$Time$toHour, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toHour, elm$time$Time$utc, now)) > -1))) ? (60 - A2(elm$time$Time$toMinute, elm$time$Time$utc, now)) : 0;
+		var hours = ((_Utils_cmp(
+			A2(elm$time$Time$toYear, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toYear, elm$time$Time$utc, now)) > -1) && (_Utils_cmp(
+			A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toDay, elm$time$Time$utc, now)) > -1)) ? (24 - A2(elm$time$Time$toHour, elm$time$Time$utc, now)) : 0;
+		var days = ((_Utils_cmp(
+			A2(elm$time$Time$toYear, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toYear, elm$time$Time$utc, now)) > -1) && (_Utils_cmp(
+			A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime),
+			A2(elm$time$Time$toDay, elm$time$Time$utc, now)) > -1)) ? (A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime) - A2(elm$time$Time$toDay, elm$time$Time$utc, now)) : 0;
+		return A2(
+			justinmimbs$time_extra$Time$Extra$partsToPosix,
+			elm$time$Time$utc,
+			A7(
+				justinmimbs$time_extra$Time$Extra$Parts,
+				A2(elm$time$Time$toYear, elm$time$Time$utc, now),
+				A2(elm$time$Time$toMonth, elm$time$Time$utc, now),
+				days,
+				hours,
+				mins,
+				secs,
+				0));
+	});
 var author$project$Main$update = F2(
 	function (msg, model) {
 		var now = msg.a;
-		var remainingTime = model.expirationTime - A2(elm$time$Time$toMillis, elm$time$Time$utc, now);
-		var status = (remainingTime < 0) ? author$project$Main$Expired : author$project$Main$Running;
+		var remainingTime = A2(author$project$Main$remainingTimefn, model.expirationTime, now);
+		var status = (A2(elm$time$Time$toMillis, elm$time$Time$utc, remainingTime) < 0) ? author$project$Main$Expired : author$project$Main$Running;
 		return _Utils_Tuple2(
 			_Utils_update(
 				model,
@@ -5771,22 +5809,10 @@ var elm$core$String$padLeft = F3(
 			string);
 	});
 var author$project$Main$timePeriods = function (time) {
-	var seconds = A2(
-		elm$time$Time$toSecond,
-		elm$time$Time$utc,
-		elm$time$Time$millisToPosix(time));
-	var minutes = A2(
-		elm$time$Time$toMinute,
-		elm$time$Time$utc,
-		elm$time$Time$millisToPosix(time));
-	var hours = A2(
-		elm$time$Time$toHour,
-		elm$time$Time$utc,
-		elm$time$Time$millisToPosix(time));
-	var days = A2(
-		elm$time$Time$toDay,
-		elm$time$Time$utc,
-		elm$time$Time$millisToPosix(time));
+	var seconds = A2(elm$time$Time$toSecond, elm$time$Time$utc, time);
+	var minutes = A2(elm$time$Time$toMinute, elm$time$Time$utc, time);
+	var hours = A2(elm$time$Time$toHour, elm$time$Time$utc, time);
+	var days = A2(elm$time$Time$toDay, elm$time$Time$utc, time);
 	var addLeadingZeros = function (n) {
 		return A3(
 			elm$core$String$padLeft,
