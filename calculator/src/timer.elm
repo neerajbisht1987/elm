@@ -36,7 +36,20 @@ type Msg = CurrentTime Time.Posix
 
 remainingTimefn : Time.Posix -> Time.Posix -> Time.Posix
 remainingTimefn exprTime now =
-    let 
+    
+    let
+        expryear =  Debug.log "exprYear" (Time.toYear utc exprTime)
+        exprhour =  Debug.log "exprhour" (Time.toHour utc exprTime)
+        exprMin =  Debug.log "exprMin" (Time.toMinute utc exprTime)
+        exprSec =  Debug.log "exprSec" (Time.toSecond utc exprTime)
+        exprMon =  Debug.log "exprMon" (Time.toMonth utc exprTime)
+        
+        nowyear =  Debug.log "nowYear" (Time.toYear utc now)
+        nowhour =  Debug.log "nowhour" (Time.toHour utc now)
+        nowMin =  Debug.log "nowMin" (Time.toMinute utc now)
+        nowSec =  Debug.log "nowSec" (Time.toSecond utc now)
+        nowMon =  Debug.log "nowMon" (Time.toMonth utc now)
+
         days =
             if Time.toYear utc exprTime >=  Time.toYear utc now &&
                --Time.toMonth utc exprTime >= Time.toMonth utc now &&
@@ -68,14 +81,16 @@ remainingTimefn exprTime now =
                     60 - Time.toSecond utc now
                 else
                     0
-        in 
-        Time.Parts (Time.toYear utc now) (Time.toMonth utc now) days hours mins secs 0 |> Time.partsToPosix utc
+       in
+       Debug.log "Time Value" 
+        (Time.Parts (Time.toYear utc now) (Time.toMonth utc now) days hours mins secs 0 )|> Time.partsToPosix utc
 
 update : Msg -> Model  ->( Model ,Cmd Msg)
 
 update msg model =
     case msg of 
         CurrentTime now ->
+            
             let 
                 remainingTime =
                     remainingTimefn model.expirationTime now
@@ -125,7 +140,7 @@ timePeriods time =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-        Time.every 1000 CurrentTime
+        Time.every 10 CurrentTime
 
 
 main : Program () Model Msg
