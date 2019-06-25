@@ -1,0 +1,108 @@
+body {
+  font-family: "Helvetica Neue", "Helvetica", "Verdana", Arial, sans-serif;
+  color: #4f4f4f;
+  background-color: #eaeaea;
+}
+
+h1, h2, h3, h4 {
+  color: #666666;
+  text-align: center;
+}
+
+h1 {
+  font-size: 4em;
+}
+
+h2 {
+  margin-top: 0.25em;
+  font-weight: 300;
+  font-size: 2.5em;
+}
+
+h3 {
+  font-weight: 300;
+  font-size: 2.5em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+#countdown-timer {
+  margin-top: 3em;
+  margin-bottom: 3em;
+}
+
+.time-period {
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.time-period .amount {
+  font-size: 300%;
+  padding: 15px;
+  border-radius: 4px;
+  background: #ccc;
+}
+
+.time-period .period {
+  display: block;
+  color: #7B7D7D;
+  padding-top: 15px;
+  text-transform: uppercase;
+}
+
+.btn {
+  padding: 14px 24px;
+  border: 0 none;
+  font-weight: 300;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn:focus, .btn:active:focus, .btn.active:focus {
+  outline: 0 none;
+}
+
+.btn-primary {
+  background: #3CA53A;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+  background: #2F7E2E;
+}
+
+.btn-primary:active, .btn-primary.active {
+  background: #256126;
+  box-shadow: none;
+}
+
+.header {
+  margin-bottom: 3em;
+}
+
+.row {
+  margin-top: 2em;  
+}
+
+[class*='col-'] > div {
+  border: 3px solid #ccc;
+  height: 200px;
+}
+
+[class*='col-'] > .buy {
+  border: none;
+  height: 225px;
+  text-align: center;
+}
+
+[class*='col-'] > div.app-1,
+[class*='col-'] > div.app-2,
+[class*='col-'] > div.app-4,
+[class*='col-'] > div.app-5,
+[class*='col-'] > div.app-6 {
+  height: 200px;
+}
+
+[class*='col-'] > div.app-3 {
+  height: 200px;
+}
