@@ -25,7 +25,7 @@ type alias Model =
 initModel : (Model, Cmd Msg)
 initModel = ({
     expirationTime=
-        Time.Parts 2019 Time.Jul 14 13 5 0 0 |> Time.partsToPosix utc,
+        Time.Parts 2019 Time.Jun 30 13 5 0 0 |> Time.partsToPosix utc,
     remainingTime=Time.millisToPosix 0,
     status=Running}, Cmd.none)
 
@@ -38,52 +38,65 @@ remainingTimefn : Time.Posix -> Time.Posix -> Time.Posix
 remainingTimefn exprTime now =
     
     let
-        expryear =  Debug.log "exprYear" (Time.toYear utc exprTime)
-        exprhour =  Debug.log "exprhour" (Time.toHour utc exprTime)
-        exprMin =  Debug.log "exprMin" (Time.toMinute utc exprTime)
-        exprSec =  Debug.log "exprSec" (Time.toSecond utc exprTime)
-        exprMon =  Debug.log "exprMon" (Time.toMonth utc exprTime)
+        expireYear =  Debug.log "exprYear" (Time.toYear utc exprTime)
+        expireDay =  Debug.log "exprday" (Time.toDay utc exprTime)
+        expireHour =  Debug.log "exprhour" (Time.toHour utc exprTime)
+        expireMin =  Debug.log "exprMin" (Time.toMinute utc exprTime)
+        expireSec =  Debug.log "exprSec" (Time.toSecond utc exprTime)
+        expireMon =  Debug.log "exprMon" (Time.toMonth utc exprTime)
         
-        nowyear =  Debug.log "nowYear" (Time.toYear utc now)
-        nowhour =  Debug.log "nowhour" (Time.toHour utc now)
+        nowYear =  Debug.log "nowYear" (Time.toYear utc now)
+        nowDay =  Debug.log "nowday" (Time.toDay utc now)
+        nowHour =  Debug.log "nowhour" (Time.toHour utc now)
         nowMin =  Debug.log "nowMin" (Time.toMinute utc now)
         nowSec =  Debug.log "nowSec" (Time.toSecond utc now)
         nowMon =  Debug.log "nowMon" (Time.toMonth utc now)
 
         days =
-            if Time.toYear utc exprTime >=  Time.toYear utc now &&
-               --Time.toMonth utc exprTime >= Time.toMonth utc now &&
-               Time.toDay utc exprTime >= Time.toDay utc now
+            if expireYear>= nowYear &&
+                expireDay >= nowDay
             then
-                Time.toDay utc exprTime - Time.toDay utc now
+                expireDay - nowDay
             else
                 0
-        hours = if Time.toYear utc exprTime >=  Time.toYear utc now &&
-                   --Time.toMonth utc exprTime >= Time.toMonth utc now &&
-                   Time.toDay utc exprTime >= Time.toDay utc now 
+        hours =
+            if expireYear>= nowYear &&
+                expireDay >= nowDay
                 then
-                     24 - Time.toHour utc now
+                     24 - nowHour 
                 else
                     0
-        mins =if Time.toYear utc exprTime >=  Time.toYear utc now &&
-                 --Time.toMonth utc exprTime >= Time.toMonth utc now &&
-                 Time.toDay utc exprTime >= Time.toDay utc now &&
-                  Time.toHour utc exprTime >= Time.toHour utc now 
+        mins =
+            if expireYear>= nowYear &&
+                expireDay >= nowDay &&
+                expireHour >= nowHour
                 then
-                    60 - Time.toMinute utc now
+                    60 - nowMin
               else 0      
-        secs= if Time.toYear utc exprTime >=  Time.toYear utc now &&
-                 --Time.toMonth utc exprTime >= Time.toMonth utc now &&
-                 Time.toDay utc exprTime >= Time.toDay utc now &&
-                 Time.toHour utc exprTime >= Time.toHour utc now &&
-                 Time.toMinute utc exprTime >= Time.toMinute utc now 
+        secs= 
+            if expireYear>= nowYear &&
+                expireDay >= nowDay &&
+                expireHour > nowHour
                 then
-                    60 - Time.toSecond utc now
+                  60-nowSec  
+            else if expireYear>= nowYear &&
+                expireDay >= nowDay &&
+                expireHour == nowHour &&
+                expireMin > nowMin
+                then
+                    60 - nowSec
+            else if expireYear>= nowYear &&
+                expireDay >= nowDay &&
+                expireHour == nowHour &&
+                expireMin == nowMin &&
+                expireSec > nowSec
+                then
+                    60 - nowSec
                 else
                     0
        in
        Debug.log "Time Value" 
-        (Time.Parts (Time.toYear utc now) (Time.toMonth utc now) days hours mins secs 0 )|> Time.partsToPosix utc
+        (Time.Parts expireYear expireMon days hours mins secs 0 )|> Time.partsToPosix utc
 
 update : Msg -> Model  ->( Model ,Cmd Msg)
 

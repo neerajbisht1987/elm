@@ -5404,7 +5404,7 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var elm$time$Time$Jul = {$: 'Jul'};
+var elm$time$Time$Jun = {$: 'Jun'};
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
@@ -5591,7 +5591,7 @@ var elm$time$Time$Aug = {$: 'Aug'};
 var elm$time$Time$Dec = {$: 'Dec'};
 var elm$time$Time$Feb = {$: 'Feb'};
 var elm$time$Time$Jan = {$: 'Jan'};
-var elm$time$Time$Jun = {$: 'Jun'};
+var elm$time$Time$Jul = {$: 'Jul'};
 var elm$time$Time$Mar = {$: 'Mar'};
 var elm$time$Time$May = {$: 'May'};
 var elm$time$Time$Nov = {$: 'Nov'};
@@ -5737,7 +5737,7 @@ var author$project$Main$initModel = _Utils_Tuple2(
 		expirationTime: A2(
 			justinmimbs$time_extra$Time$Extra$partsToPosix,
 			elm$time$Time$utc,
-			A7(justinmimbs$time_extra$Time$Extra$Parts, 2019, elm$time$Time$Jul, 14, 13, 5, 0, 0)),
+			A7(justinmimbs$time_extra$Time$Extra$Parts, 2019, elm$time$Time$Jun, 30, 13, 5, 0, 0)),
 		remainingTime: elm$time$Time$millisToPosix(0),
 		status: author$project$Main$Running
 	},
@@ -6253,23 +6253,10 @@ var author$project$Main$Expired = {$: 'Expired'};
 var elm$core$Debug$log = _Debug_log;
 var author$project$Main$remainingTimefn = F2(
 	function (exprTime, now) {
-		var secs = ((_Utils_cmp(
-			A2(elm$time$Time$toYear, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toYear, elm$time$Time$utc, now)) > -1) && ((_Utils_cmp(
-			A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toDay, elm$time$Time$utc, now)) > -1) && ((_Utils_cmp(
-			A2(elm$time$Time$toHour, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toHour, elm$time$Time$utc, now)) > -1) && (_Utils_cmp(
-			A2(elm$time$Time$toMinute, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toMinute, elm$time$Time$utc, now)) > -1)))) ? (60 - A2(elm$time$Time$toSecond, elm$time$Time$utc, now)) : 0;
-		var nowyear = A2(
+		var nowYear = A2(
 			elm$core$Debug$log,
 			'nowYear',
 			A2(elm$time$Time$toYear, elm$time$Time$utc, now));
-		var nowhour = A2(
-			elm$core$Debug$log,
-			'nowhour',
-			A2(elm$time$Time$toHour, elm$time$Time$utc, now));
 		var nowSec = A2(
 			elm$core$Debug$log,
 			'nowSec',
@@ -6282,58 +6269,49 @@ var author$project$Main$remainingTimefn = F2(
 			elm$core$Debug$log,
 			'nowMin',
 			A2(elm$time$Time$toMinute, elm$time$Time$utc, now));
-		var mins = ((_Utils_cmp(
-			A2(elm$time$Time$toYear, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toYear, elm$time$Time$utc, now)) > -1) && ((_Utils_cmp(
-			A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toDay, elm$time$Time$utc, now)) > -1) && (_Utils_cmp(
-			A2(elm$time$Time$toHour, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toHour, elm$time$Time$utc, now)) > -1))) ? (60 - A2(elm$time$Time$toMinute, elm$time$Time$utc, now)) : 0;
-		var hours = ((_Utils_cmp(
-			A2(elm$time$Time$toYear, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toYear, elm$time$Time$utc, now)) > -1) && (_Utils_cmp(
-			A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toDay, elm$time$Time$utc, now)) > -1)) ? (24 - A2(elm$time$Time$toHour, elm$time$Time$utc, now)) : 0;
-		var expryear = A2(
+		var nowHour = A2(
+			elm$core$Debug$log,
+			'nowhour',
+			A2(elm$time$Time$toHour, elm$time$Time$utc, now));
+		var nowDay = A2(
+			elm$core$Debug$log,
+			'nowday',
+			A2(elm$time$Time$toDay, elm$time$Time$utc, now));
+		var expireYear = A2(
 			elm$core$Debug$log,
 			'exprYear',
 			A2(elm$time$Time$toYear, elm$time$Time$utc, exprTime));
-		var exprhour = A2(
-			elm$core$Debug$log,
-			'exprhour',
-			A2(elm$time$Time$toHour, elm$time$Time$utc, exprTime));
-		var exprSec = A2(
+		var expireSec = A2(
 			elm$core$Debug$log,
 			'exprSec',
 			A2(elm$time$Time$toSecond, elm$time$Time$utc, exprTime));
-		var exprMon = A2(
+		var expireMon = A2(
 			elm$core$Debug$log,
 			'exprMon',
 			A2(elm$time$Time$toMonth, elm$time$Time$utc, exprTime));
-		var exprMin = A2(
+		var expireMin = A2(
 			elm$core$Debug$log,
 			'exprMin',
 			A2(elm$time$Time$toMinute, elm$time$Time$utc, exprTime));
-		var days = ((_Utils_cmp(
-			A2(elm$time$Time$toYear, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toYear, elm$time$Time$utc, now)) > -1) && (_Utils_cmp(
-			A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime),
-			A2(elm$time$Time$toDay, elm$time$Time$utc, now)) > -1)) ? (A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime) - A2(elm$time$Time$toDay, elm$time$Time$utc, now)) : 0;
+		var expireHour = A2(
+			elm$core$Debug$log,
+			'exprhour',
+			A2(elm$time$Time$toHour, elm$time$Time$utc, exprTime));
+		var expireDay = A2(
+			elm$core$Debug$log,
+			'exprday',
+			A2(elm$time$Time$toDay, elm$time$Time$utc, exprTime));
+		var hours = ((_Utils_cmp(expireYear, nowYear) > -1) && (_Utils_cmp(expireDay, nowDay) > -1)) ? (24 - nowHour) : 0;
+		var mins = ((_Utils_cmp(expireYear, nowYear) > -1) && ((_Utils_cmp(expireDay, nowDay) > -1) && (_Utils_cmp(expireHour, nowHour) > -1))) ? (60 - nowMin) : 0;
+		var secs = ((_Utils_cmp(expireYear, nowYear) > -1) && ((_Utils_cmp(expireDay, nowDay) > -1) && (_Utils_cmp(expireHour, nowHour) > 0))) ? (60 - nowSec) : (((_Utils_cmp(expireYear, nowYear) > -1) && ((_Utils_cmp(expireDay, nowDay) > -1) && (_Utils_eq(expireHour, nowHour) && (_Utils_cmp(expireMin, nowMin) > 0)))) ? (60 - nowSec) : (((_Utils_cmp(expireYear, nowYear) > -1) && ((_Utils_cmp(expireDay, nowDay) > -1) && (_Utils_eq(expireHour, nowHour) && (_Utils_eq(expireMin, nowMin) && (_Utils_cmp(expireSec, nowSec) > 0))))) ? (60 - nowSec) : 0));
+		var days = ((_Utils_cmp(expireYear, nowYear) > -1) && (_Utils_cmp(expireDay, nowDay) > -1)) ? (expireDay - nowDay) : 0;
 		return A2(
 			justinmimbs$time_extra$Time$Extra$partsToPosix,
 			elm$time$Time$utc,
 			A2(
 				elm$core$Debug$log,
 				'Time Value',
-				A7(
-					justinmimbs$time_extra$Time$Extra$Parts,
-					A2(elm$time$Time$toYear, elm$time$Time$utc, now),
-					A2(elm$time$Time$toMonth, elm$time$Time$utc, now),
-					days,
-					hours,
-					mins,
-					secs,
-					0)));
+				A7(justinmimbs$time_extra$Time$Extra$Parts, expireYear, expireMon, days, hours, mins, secs, 0)));
 	});
 var author$project$Main$update = F2(
 	function (msg, model) {
